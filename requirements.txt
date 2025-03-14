@@ -1,0 +1,4 @@
+moviepy==1.0.3
+pillow==10.4.0
+numpy==2.1.1
+# Note: tkinter needs to be installed via system package manager, not pip 

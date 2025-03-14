@@ -221,6 +221,9 @@ class VideoClipperApp:
             # Store original FPS
             self.original_fps = self.current_video.fps
             
+            # Store original resolution
+            self.original_width, self.original_height = self.current_video.size
+            
             # Update timeline slider range
             self.timeline_slider.configure(to=duration_seconds)
             
@@ -243,7 +246,7 @@ class VideoClipperApp:
             self.current_ms_var.set("000")
             self.show_current_frame()
             
-            self.status_var.set(f"Video loaded: {os.path.basename(self.video_path)} ({self.original_fps:.2f} FPS)")
+            self.status_var.set(f"Video loaded: {os.path.basename(self.video_path)} ({self.original_fps:.2f} FPS, {self.original_width}x{self.original_height})")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load video: {str(e)}")
             self.status_var.set("Error loading video")
@@ -446,6 +449,21 @@ class VideoClipperApp:
                 # If we can't get the original bitrate, use a high quality default
                 original_bitrate = '20000k'
             
+            # Ensure the clip maintains the original size (or force 1080p if needed)
+            if hasattr(self, 'original_width') and hasattr(self, 'original_height'):
+                # If original size doesn't match 1080p and user wants 1080p, resize it
+                if self.original_height < 1080:
+                    # Force resize to 1080p while maintaining aspect ratio
+                    target_height = 1080
+                    target_width = int(self.original_width * (target_height / self.original_height))
+                    subclip = subclip.resize(height=target_height, width=target_width)
+                elif self.original_height != 1080 or self.original_width != 1920:
+                    # Use original resolution if it's higher than 1080p
+                    subclip = subclip.resize(width=self.original_width, height=self.original_height)
+            else:
+                # Fallback to force 1080p if no original size is stored
+                subclip = subclip.resize(height=1080)
+            
             # Write output file with high quality settings
             subclip.write_videofile(
                 output_path,
@@ -468,8 +486,11 @@ class VideoClipperApp:
             self.current_number += 1
             self.number_var.set(str(self.current_number))
             
-            self.status_var.set(f"Video clipped successfully: {os.path.basename(output_path)}")
-            messagebox.showinfo("Success", f"Video clipped successfully!\nSaved to: {output_path}")
+            # Get the resolution of the created clip from the subclip object
+            clip_width, clip_height = subclip.size
+            
+            self.status_var.set(f"Video clipped successfully: {os.path.basename(output_path)} ({clip_width}x{clip_height})")
+            messagebox.showinfo("Success", f"Video clipped successfully!\nSaved to: {output_path}\nResolution: {clip_width}x{clip_height}")
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to clip video: {str(e)}")
