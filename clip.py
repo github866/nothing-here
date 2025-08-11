@@ -449,20 +449,7 @@ class VideoClipperApp:
                 # If we can't get the original bitrate, use a high quality default
                 original_bitrate = '20000k'
             
-            # Ensure the clip maintains the original size (or force 1080p if needed)
-            if hasattr(self, 'original_width') and hasattr(self, 'original_height'):
-                # If original size doesn't match 1080p and user wants 1080p, resize it
-                if self.original_height < 1080:
-                    # Force resize to 1080p while maintaining aspect ratio
-                    target_height = 1080
-                    target_width = int(self.original_width * (target_height / self.original_height))
-                    subclip = subclip.resize(height=target_height, width=target_width)
-                elif self.original_height != 1080 or self.original_width != 1920:
-                    # Use original resolution if it's higher than 1080p
-                    subclip = subclip.resize(width=self.original_width, height=self.original_height)
-            else:
-                # Fallback to force 1080p if no original size is stored
-                subclip = subclip.resize(height=1080)
+            # Keep the original clip size without resizing
             
             # Write output file with high quality settings
             subclip.write_videofile(

@@ -2,10 +2,10 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips
 import os
 
 start = 1
-end = 2
-text = "clip"
-num = 76
-output_video_path = "CN2.5 "+str(num)+".mp4" 
+end = 6
+text = "it"
+num = 11
+output_video_path = "neon"+str(num)+".mp4" 
 
 def get_video_info(video_path):
     """Get video information to use as reference"""
@@ -82,16 +82,8 @@ print(f"\nMerge completed successfully!")
 print(f"Merged video saved to: {output_video_path}")
 print(f"Output video settings:")
 
-# Check resolution information
+# Report final video info without enforcing 1080p
 reference_info = get_video_info(output_video_path)
-expected_resolution = (1920, 1080)  # Full HD 1080p
-
-# Compare resolution as tuples, not as lists which may cause incorrect comparison
-actual_resolution = tuple(reference_info['size'])
-if actual_resolution != expected_resolution:
-    print(f"Warning: Output video resolution {actual_resolution} differs from expected 1080p {expected_resolution}")
-else:
-    print(f"- Resolution: {actual_resolution} (1080p)")
-
+print(f"- Resolution: {tuple(reference_info['size'])}")
 print(f"- FPS: {reference_info['fps']}")
 print(f"- Bitrate: {target_bitrate}")
